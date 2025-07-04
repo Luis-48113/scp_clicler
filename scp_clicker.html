@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SCP Clicker</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #111;
+      color: #eee;
+      text-align: center;
+      padding: 20px;
+    }
+    img {
+      width: 200px;
+      cursor: pointer;
+    }
+    #store {
+      margin-top: 20px;
+      border-top: 1px solid #444;
+      padding-top: 20px;
+    }
+    .button {
+      background-color: #444;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      margin: 10px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .button:hover {
+      background-color: #666;
+    }
+  </style>
+</head>
+<body>
+  <h1>SCP Clicker</h1>
+  <p>Contain SCPs to earn Containment Points!</p>
+  <img src="https://preview.redd.it/55g77ylnwe641.jpg?auto=webp&s=33cb5123b2fc2614e1bdb86a94e01ca3c6427a4e" alt="SCP" onclick="clickSCP()" />
+  <p>Containment Points: <span id="points">0</span></p>
+  <p>Base Capacity: <span id="baseSize">100</span></p>
+  <p>Breach Risk: <span id="risk">Low</span></p>
+
+  <div id="store">
+    <h2>Store</h2>
+    <button class="button" onclick="buyMultiplier()">Buy SCP-096 (1.5x every 10s)</button>
+    <button class="button" id="upgradeBtn" onclick="upgradeBase()">Upgrade Base</button>
+  </div>
+
+  <script>
+    let points = 0;
+    let multiplier = 2;
+    let baseSize = 175;
+    let breachRisk = 'Low';
+    let upgradeCost = 150;
+    let intervalId = null; // to avoid multiple intervals on buyMultiplier
+
+    function updateUI() {
+      document.getElementById("points").innerText = Math.floor(points);
+      document.getElementById("baseSize").innerText = baseSize;
+      document.getElementById("risk").innerText = breachRisk;
+
+      // Update upgrade button text with current cost and disable if max base reached or not enough points
+      const upgradeBtn = document.getElementById("upgradeBtn");
+      if (baseSize >= 300) {
+        upgradeBtn.innerText = "Base is at maximum size!";
+        upgradeBtn.disabled = true;
+      } else {
+        upgradeBtn.innerText = `Upgrade Base - ${upgradeCost} CP`;
+        upgradeBtn.disabled = points < upgradeCost;
+      }
+    }
+
+    function clickSCP() {
+      points += 1 * multiplier;
+      updateUI();
+    }
+
+    function buyMultiplier() {
+      if (points >= 100) {
+        if (intervalId === null) {
+          points -= 100;
+          intervalId = setInterval(() => {
+            points += 1.5 * multiplier;
+            updateUI();
+          }, 10000);
+          alert("SCP-096 purchased! You now earn bonus CP every 10 seconds.");
+          updateUI();
+        } else {
+          alert("You already own SCP-096 multiplier!");
+        }
+      } else {
+        alert("Not enough points.");
+      }
+    }
+
+    function upgradeBase() {
+      if (points >= upgradeCost) {
+        if (baseSize === 175) {
+          baseSize = 200;
+          breachRisk = 'Medium';
+          upgradeCost = 250; // increase next upgrade cost
+          points -= 150; // cost for first upgrade
+        } else if (baseSize === 200) {
+          baseSize = 300;
+          breachRisk = 'High';
+          upgradeCost = 0; // no more upgrades
+          points -= 250; // cost for second upgrade
+        } else {
+          alert("Base is at maximum size!");
+          return;
+        }
+        alert("Base upgraded! Keep an eye on that breach risk...");
+        updateUI();
+      } else {
+        alert(`Not enough points to upgrade base. You need ${upgradeCost} CP.`);
+      }
+    }
+
+    updateUI();
+  </script>
+</body>
+</html>
